@@ -70,13 +70,12 @@ class DAO:
         result = 0
 
         cursor = conn.cursor(dictionary=True)
-        query = """select count(*) as peso
-                from new_ufo_sightings.sighting s, new_ufo_sightings.sighting s2 
-                where s2.state = %s and s.state = %s and year(s2.`datetime`) = %s
-                and  year(s2.`datetime`) = year(s.`datetime`) and s2.id < s.id
-                and (datediff(s.`datetime`, s2.`datetime`) < %s and datediff(s.`datetime`, s2.`datetime`) > -%s)"""
+        query = """select s.state as s1, s2.state as s2, count(distinct(s.id)) as peso
+                from sighting s, sighting s2 
+                where ((s.state = %s and s2.state = %s) or (s.state = %s and s2.state = %s))
+                and abs(datediff(s.`datetime`, s2.`datetime`)) < %s and year(s.`datetime`) = %s"""
 
-        cursor.execute(query, (u, v, anno, giorni, giorni))
+        cursor.execute(query, (u, v, v, u, giorni, anno))
 
         for row in cursor:
             if row["peso"]:

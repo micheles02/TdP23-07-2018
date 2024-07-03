@@ -22,6 +22,7 @@ class Controller:
         else:
             anno = int(self._view.ddyear.value)
             giorni = int(self._view.txt_giorni.value)
+            print("prila")
             self._model.creaGrafo(anno, giorni)
             self._view.txt_result.controls.append(ft.Text(f"nodi: {self._model.grafoDetails()[0]}, archi: {self._model.grafoDetails()[1]}"))
             pesi = self._model.pesiNodi()

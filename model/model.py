@@ -1,7 +1,6 @@
 import copy
 
 from database.DAO import DAO
-from model.cromosoma import Cromosoma
 import networkx as nx
 
 
@@ -16,8 +15,11 @@ class Model:
         self.grafo.clear()
         self.grafo.add_nodes_from(self.idMap.keys())
         self.grafo.add_edges_from(DAO.getVicini())
+        print("pesi")
         for (u, v) in self.grafo.edges:
-            self.grafo[u][v]["weight"] = DAO.getPeso(u, v, anno, giorni)
+            peso = DAO.getPeso(u, v, anno, giorni)
+            print(peso)
+            self.grafo[u][v]["weight"] = peso
 
     def grafoDetails(self):
         return len(self.grafo.nodes), len(self.grafo.edges)
