@@ -10,25 +10,48 @@ class Controller:
         # the model, which implements the logic of the program and holds the data
         self._model = model
 
-    def fillDD(self):
-        anni = DAO.getAnni()
 
-        self._view.ddyear.options = list(map(lambda x: ft.dropdown.Option(x), anni))
+    def fillDD(self):
+        anni = self._model.year
+        for a in anni:
+            self._view.ddyear.options.append(ft.dropdown.Option(data=a,
+                                                               text = a,
+                                                               on_click=self.choiceYear))
+        self._view.update_page()
+
+
+
+
+
+    def choiceYear(self,e ):
+        if e.control.data is None:
+            self.Year = None
+        else:
+            self.Year = e.control.data
 
     def handle_graph(self, e):
-        if not int(self._view.ddyear.value):
-            self._view.create_alert("inserisci anno")
+        giorni = self._view.txt_giorni.value
+
+        try:
+            intGiorni = int(giorni)
+        except ValueError:
+            self._view.create_alert("Inserire un valore numerico")
+        if intGiorni < 1 or intGiorni > 180:
+            self._view.create_alert("inserire un valore nell'intervallo considerato")
             return
-        else:
-            anno = int(self._view.ddyear.value)
-            giorni = int(self._view.txt_giorni.value)
-            print("prila")
-            self._model.creaGrafo(anno, giorni)
-            self._view.txt_result.controls.append(ft.Text(f"nodi: {self._model.grafoDetails()[0]}, archi: {self._model.grafoDetails()[1]}"))
-            pesi = self._model.pesiNodi()
-            for peso in pesi:
-                self._view.txt_result.controls.append(ft.Text(f"nodo {peso[0]}, peso: {peso[1]}"))
-            self._view.update_page()
+        self._model.buildGraph(self.Year, intGiorni)
+
+        self._view.txt_result.controls.clear()
+        nodi, archi = self._model.graph_details()
+        self._view.txt_result.controls.append(ft.Text(f"Grafo creato!"
+                                                     f"#Vertici: {nodi}"
+                                                     f"#Archi: {archi}"))
+
+        risultato = self._model.getPesi()
+        for r in risultato:
+            self._view.txt_result.controls.append(ft.Text(f"{r[0]} --> {r[1]}"))
+        self._view.update_page()
+
 
     def handle_search(self, e):
         pass
